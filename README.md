@@ -18,9 +18,9 @@ Where possible, specs where sourced from the latest CentOS (7) or Fedora (Rawhid
 
 Versioning is based on three levels:
 
- 1.- Direct media libraries/programs are locally built with the latest (stable) version.
- 2.- Existing AWS rpms that require upgrading due to #1 dependencies are upgraded.
- 3.- Existing AWS rpms that don't affect either #1 or #2 are installed from the AWS repo.
+ - Direct media libraries/programs are locally built with the latest (stable) version.
+ - Existing AWS rpms that require upgrading due to #1 dependencies are upgraded.
+ - Existing AWS rpms that don't affect either #1 or #2 are installed from the AWS repo.
 
 All libraries, binaries or support files for *any* X system have been disabled.
 
