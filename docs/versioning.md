@@ -1,5 +1,3 @@
-Versioning documentation
-
 Versioning of packages was done backwards based on dependencies, for example:
 
   - FFmpeg 2.7 -> frei0r 1.4 (unavailable, requires building)
@@ -19,3 +17,5 @@ For maximum compatibility, Fedora and CentOS SRPMs are prefferred, falling back 
 In all packages, systemd and X windowing systems have either been disabled, patched out or ignored.
 
 Python has been standardized to 2.7 across all packages - python3 is not used as many dependent packages or source code does not support it yet.
+
+Most packages ship without static libraries by default, in all cases these have been enabled.
