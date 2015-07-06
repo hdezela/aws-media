@@ -1,0 +1,87 @@
+diff -urp trousers-0.3.4.orig/dist/fedora/fedora.initrd.tcsd trousers-0.3.4/dist/fedora/fedora.initrd.tcsd
+--- trousers-0.3.4.orig/dist/fedora/fedora.initrd.tcsd	2010-06-30 16:59:13.000000000 -0400
++++ trousers-0.3.4/dist/fedora/fedora.initrd.tcsd	2010-07-07 10:59:53.000000000 -0400
+@@ -49,29 +49,39 @@ GREP=/bin/grep
+ 
+ load_drivers()
+ {
+-	for d in `echo /lib/modules/$(uname -r)/kernel/drivers/char/tpm/tpm_*`; do
++	for d in `echo /lib/modules/$(uname -r)/kernel/drivers/char/tpm/tpm_*`
++	do
+ 		$INSMOD $d
+ 		if test $? -eq 0; then
+-			break;
++			return 0
+ 		fi
+ 	done
++	return 1
+ }
+ 
+ check_drivers()
+ {
+-	$LSMOD | $GREP tpm_
++	tmp=`$LSMOD | $GREP tpm_ 2> /dev/null`
++	if [ "x$tmp" != "x" ] ; then
++		return 0
++	fi
++	return 1
+ }
+ 
+ start()
+ {
+ 	test -x $TCSD || exit 5
+ 	test -f /etc/tcsd.conf || exit 6
+-	check_drivers || load_drivers || failure
+-	echo -n $"Starting $prog: "
+-	$TCSD $OPTIONS && success || failure
+-	RETVAL=$?
+-	[ "$RETVAL" = 0 ] && touch /var/lock/subsys/tcsd
+-	echo
++	check_drivers || load_drivers || exit 1
++	if [ ! -f /var/lock/subsys/tcsd ] ; then
++		echo -n $"Starting $prog: "
++		daemon $prog "$OPTIONS "
++		RETVAL=$?
++		echo
++		if test $RETVAL = 0 ; then
++			touch /var/lock/subsys/tcsd
++		fi
++	fi
+ }
+ 
+ stop()
+@@ -79,8 +89,14 @@ stop()
+ 	echo -n $"Stopping $prog: "
+ 	killproc $prog
+ 	RETVAL=$?
+-	[ "$RETVAL" = 0 ] && rm -f /var/lock/subsys/tcsd
+ 	echo
++	rm -f /var/lock/subsys/tcsd
++}
++
++restart(){
++	test -f /etc/tcsd.conf  || exit 6
++	stop
++	start
+ }
+ 
+ case "$1" in
+@@ -91,9 +107,7 @@ case "$1" in
+ 		stop
+ 		;;
+ 	restart)
+-		test -f /etc/tcsd.conf  || exit 6
+-		stop
+-		start
++		restart
+ 		;;
+ 	reload|force-reload)
+ 		restart
+@@ -105,6 +119,6 @@ case "$1" in
+ 		;;
+ 	*)
+ 		echo $"Usage: $0 {start|stop|restart|reload|force-reload|condrestart|try-restart|status}"
+-		RETVAL=3
++		RETVAL=2
+ esac
+ exit $RETVAL

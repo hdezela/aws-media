@@ -1,0 +1,35 @@
+# A level that will provide security on a conservative level that is
+# believed to withstand any near-term future attacks. That will be
+# an 112-bit security level, without including protocols with known
+# attacks available (e.g. SSL 3.0). This level may prevent communication
+# with many used systems that provide weaker security levels (e.g.,
+# systems that use SHA-1 as signature algorithm).
+
+# MACs: SHA1+
+# Curves: of size 256+ or better
+# Signature algorithms: must use SHA-256 hash or better
+# Ciphers: AES-GCM, AES-CBC, CAMELLIA-GCM, CAMELLIA-CBC
+#   (Note that AES256 should be prioritized after AES128 to conserve resources.)
+# Key exchange: ECDHE, RSA, DHE
+# DH params size: 2048+
+# RSA params size: 2048+
+# Protocols: TLS1.2+
+
+CONFIG_GNUTLS="SYSTEM=NONE:+VERS-TLS1.2:"\
+"+VERS-DTLS1.2:"\
+"+AEAD:+SHA1:+SHA256:+SHA384:"\
+"+ECDHE-RSA:+ECDHE-ECDSA:+RSA:+DHE-RSA:+DHE-DSS:"\
+"+AES-128-GCM:+AES-128-CBC:+CAMELLIA-128-GCM:+CAMELLIA-128-CBC:"\
+"+AES-256-GCM:+AES-256-CBC:+CAMELLIA-256-GCM:+CAMELLIA-256-CBC:"\
+"+SIGN-ALL:-SIGN-RSA-MD5:-SIGN-RSA-SHA1:-SIGN-DSA-SHA1:-SIGN-ECDSA-SHA1:"\
+"+CURVE-SECP256R1:+CURVE-SECP384R1:+CURVE-SECP521R1:+COMP-NULL:%PROFILE_MEDIUM"
+
+# By using "!SSLv2:!SSLv3" we get the TLS 1.2-only ciphersuites;
+# that is not ideal, but it is better than nothing.
+# we explicitly allow the PSK ciphersuites in openssl as OpenSSL
+# enables them by default.
+CONFIG_OPENSSL=\
+"!SSLv2:!SSLv3:kEECDH:kRSA:kEDH:kPSK:"\
+"+CAMELLIA128:+AES256:+CAMELLIA256:"\
+"!aNULL:!eNULL:!3DES:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES"
+

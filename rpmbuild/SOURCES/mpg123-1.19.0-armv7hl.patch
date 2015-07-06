@@ -1,0 +1,12 @@
+diff -up mpg123-1.19.0/configure.ac~ mpg123-1.19.0/configure.ac
+--- mpg123-1.19.0/configure.ac~	2014-03-08 12:28:57.000000000 +0100
++++ mpg123-1.19.0/configure.ac	2014-04-06 14:31:25.436749086 +0200
+@@ -493,7 +493,7 @@ fi
+ 
+ newoldwritesample=disabled
+ case $host in
+-  arm*-*-linux*-*eabihf)
++  arm*-*-linux*-*eabihf|armv7hl*-*-linux*)
+     cpu_type="arm_fpu"
+   ;;
+   arm*-*-linux*)

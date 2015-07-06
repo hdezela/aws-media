@@ -1,0 +1,53 @@
+From 396e9e5ee67dd3169aef6ef734d1f5e6f0ec76a9 Mon Sep 17 00:00:00 2001
+From: Diego Nehab <diego@impa.br>
+Date: Mon, 9 Sep 2013 14:23:00 -0300
+Subject: [PATCH] Fixed timeout bug introduced by commit e81a6ff
+
+---
+ src/buffer.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/src/buffer.c b/src/buffer.c
+index 4ef4e8e..423d804 100644
+--- a/src/buffer.c
++++ b/src/buffer.c
+@@ -78,9 +78,7 @@ int buffer_meth_send(lua_State *L, p_buffer buf) {
+     const char *data = luaL_checklstring(L, 2, &size);
+     long start = (long) luaL_optnumber(L, 3, 1);
+     long end = (long) luaL_optnumber(L, 4, -1);
+-#ifdef LUASOCKET_DEBUG
+-    p_timeout tm = timeout_markstart(buf->tm);
+-#endif
++    timeout_markstart(buf->tm);
+     if (start < 0) start = (long) (size+start+1);
+     if (end < 0) end = (long) (size+end+1);
+     if (start < 1) start = (long) 1;
+@@ -98,7 +96,7 @@ int buffer_meth_send(lua_State *L, p_buffer buf) {
+     }
+ #ifdef LUASOCKET_DEBUG
+     /* push time elapsed during operation as the last return value */
+-    lua_pushnumber(L, timeout_gettime() - timeout_getstart(tm));
++    lua_pushnumber(L, timeout_gettime() - timeout_getstart(buf->tm));
+ #endif
+     return lua_gettop(L) - top;
+ }
+@@ -111,9 +109,7 @@ int buffer_meth_receive(lua_State *L, p_buffer buf) {
+     luaL_Buffer b;
+     size_t size;
+     const char *part = luaL_optlstring(L, 3, "", &size);
+-#ifdef LUASOCKET_DEBUG
+-    p_timeout tm = timeout_markstart(buf->tm);
+-#endif
++    timeout_markstart(buf->tm);
+     /* initialize buffer with optional extra prefix 
+      * (useful for concatenating previous partial results) */
+     luaL_buffinit(L, &b);
+@@ -149,7 +145,7 @@ int buffer_meth_receive(lua_State *L, p_buffer buf) {
+     }
+ #ifdef LUASOCKET_DEBUG
+     /* push time elapsed during operation as the last return value */
+-    lua_pushnumber(L, timeout_gettime() - timeout_getstart(tm));
++    lua_pushnumber(L, timeout_gettime() - timeout_getstart(buf->tm));
+ #endif
+     return lua_gettop(L) - top;
+ }

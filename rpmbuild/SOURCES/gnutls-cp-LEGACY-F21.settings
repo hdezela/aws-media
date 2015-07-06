@@ -1,0 +1,25 @@
+# A level that will ensure maximum compatibility with legacy systems.
+# It should provide at least 64-bit security and include RC4 and MD5 (for HMAC).
+
+# MACs: MD5, SHA1+
+# Curves: All supported
+# Signature algorithms: must use SHA-1 hash or better
+# (Note: signature algorithms restrictions shouldn't apply to self-signatures)
+# Ciphers: AES-GCM, AES-CBC, CAMELLIA-GCM, CAMELLIA-CBC, 3DES-CBC, RC4
+# Key exchange: ECDHE, RSA, DHE
+# DH params size: 767+
+# RSA params size: 767+
+# Protocols: All supported (SSL3.0+)
+
+CONFIG_GNUTLS="SYSTEM=NONE:+VERS-TLS-ALL:+MAC-ALL:+ECDHE-RSA:+ECDHE-ECDSA:+RSA:+DHE-RSA:+DHE-DSS:"\
+"+AES-128-GCM:+AES-128-CBC:+CAMELLIA-128-GCM:+CAMELLIA-128-CBC:"\
+"+AES-256-GCM:+AES-256-CBC:+CAMELLIA-256-GCM:+CAMELLIA-256-CBC:"\
+"+3DES-CBC:+ARCFOUR-128:"\
+"+SIGN-ALL:-SIGN-RSA-MD5:"\
+"+CURVE-ALL:+COMP-NULL:%PROFILE_VERY_WEAK"
+
+CONFIG_OPENSSL=\
+"!SSLv2:kEECDH:kRSA:kEDH:kPSK:"\
+"+CAMELLIA128:+AES256:+CAMELLIA256:+3DES:+RC4:"\
+"!aNULL:!eNULL:!EXP:!SEED:!IDEA:!DES"
+

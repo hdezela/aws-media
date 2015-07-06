@@ -1,0 +1,63 @@
+From 1622a28581e2c4afa9061b72a05dc1c171e891f2 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Tue, 17 Feb 2015 14:25:38 +0100
+Subject: [PATCH] guardian.lua: Update for website changes
+
+See https://bugzilla.redhat.com/show_bug.cgi?id=1134853
+---
+ share/media/guardian.lua | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/share/media/guardian.lua b/share/media/guardian.lua
+index 454971c..7435204 100644
+--- a/share/media/guardian.lua
++++ b/share/media/guardian.lua
+@@ -35,13 +35,17 @@ function parse(qargs)
+   qargs.duration_ms = Guardian.parse_duration(p)
+ 
+   qargs.title = (p:match('"og:title" content="(.-)"') or '')
+-                  :gsub('%s+%-%s+video','')
++  qargs.title = qargs.title:gsub('%s+%-%s+video','')
++  qargs.title = qargs.title:gsub('%s+%–%s+video','')
++
++  -- FIXME this should be more generic
++  qargs.title = qargs.title:gsub('&#x27;', "'")
+ 
+   qargs.id = (p:match('prop8%s+=%s+["\'](.-)["\']') or '')
+               :match('(%d+)') or ''
+ 
+-  qargs.thumb_url = p:match('"thumbnail" content="(.-)"')
+-                      or p:match('"og:image" content="(.-)"') or ''
++  qargs.thumb_url = p:match('"og:image" content="(.-)"')
++                      or p:match('"thumbnail" content="(.-)"') or ''
+ 
+   qargs.streams = Guardian.iter_streams(p)
+ 
+@@ -75,7 +79,7 @@ function Guardian.fetch(qargs)
+ end
+ 
+ function Guardian.iter_streams(p)
+-  local u = p:match("%s+file.-:%s+'(.-)'")
++  local u = p:match('&file=(.-)&poster')
+               or error('no match: media stream URL')
+   local S = require 'quvi/stream'
+   local s = S.stream_new(u)
+@@ -86,9 +90,13 @@ end
+ 
+ function Guardian.parse_duration(p)
+   local n = tonumber(p:match('duration%:%s+"?(%d+)"?') or 0) * 1000
+-  if n ==0 then
++  if n == 0 then
+     local m,s = p:match('T(%d+)M(%d+)S')
+-    n = (tonumber(m)*60 + tonumber(s)) * 1000
++    n = ((tonumber(m) or 0) *60 + (tonumber(s) or 0)) * 1000
++  end
++  if n == 0 then
++    local s = p:match('content="PT(%d+)S"')
++    n = (tonumber(s) or 0) * 1000
+   end
+   return n
+ end
+-- 
+2.1.0
+

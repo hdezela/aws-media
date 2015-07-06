@@ -1,0 +1,8 @@
+--- a/configure.in	Sun Jul 05 03:05:57 2015
++++ b/configure.in	Sun Jul 05 03:23:29 2015
+@@ -492,4 +492,4 @@
+         FL_LANGVOX=$with_langvox )
+ AC_SUBST(FL_LANGVOX)
+ 
+-AC_OUTPUT(config/config config/system.mak)
++AC_OUTPUT(config/config config/system.mak flite.pc)

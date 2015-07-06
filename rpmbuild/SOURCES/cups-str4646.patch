@@ -1,0 +1,13 @@
+diff -up cups-2.0.3/scheduler/job.c.str4646 cups-2.0.3/scheduler/job.c
+--- cups-2.0.3/scheduler/job.c.str4646	2015-06-25 08:57:18.780913432 +0100
++++ cups-2.0.3/scheduler/job.c	2015-06-25 08:57:29.669132254 +0100
+@@ -392,7 +392,9 @@ cupsdCheckJobs(void)
+ 	  * Start the job...
+ 	  */
+ 
++	  cupsArraySave(ActiveJobs);
+ 	  start_job(job, printer);
++	  cupsArrayRestore(ActiveJobs);
+ 	}
+       }
+     }

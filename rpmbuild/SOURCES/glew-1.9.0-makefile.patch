@@ -1,0 +1,54 @@
+diff -up glew-1.10.0/Makefile.make glew-1.10.0/Makefile
+--- glew-1.10.0/Makefile.make	2013-11-17 18:29:37.553236393 +1000
++++ glew-1.10.0/Makefile	2013-11-17 18:30:30.063700846 +1000
+@@ -41,9 +41,9 @@ $(error "Platform '$(SYSTEM)' not suppor
+ endif
+ 
+ GLEW_DEST ?= /usr
+-BINDIR    ?= $(GLEW_DEST)/bin
+-LIBDIR    ?= $(GLEW_DEST)/lib
+-INCDIR    ?= $(GLEW_DEST)/include/GL
++BINDIR    ?= $(GLEW_DEST)$(bindir)
++LIBDIR    ?= $(GLEW_DEST)$(libdir)
++INCDIR    ?= $(GLEW_DEST)$(includedir)/GL
+ 
+ DIST_NAME     ?= glew-$(GLEW_VERSION)
+ DIST_SRC_ZIP ?= $(shell pwd)/$(DIST_NAME).zip
+@@ -237,7 +237,7 @@ ifeq ($(filter-out mingw% cygwin,$(SYSTE
+ 	$(INSTALL) -d -m 0755 "$(DESTDIR)$(BINDIR)"
+ 	$(INSTALL) -m 0755 lib/$(LIB.SHARED) "$(DESTDIR)$(BINDIR)/"
+ else
+-	$(INSTALL) -m 0644 lib/$(LIB.SHARED) "$(DESTDIR)$(LIBDIR)/"
++	$(INSTALL) -m 0755 lib/$(LIB.SHARED) "$(DESTDIR)$(LIBDIR)/"
+ endif
+ ifneq ($(LN),)
+ 	$(LN) $(LIB.SHARED) "$(DESTDIR)$(LIBDIR)/$(LIB.SONAME)"
+@@ -259,7 +259,7 @@ ifeq ($(filter-out mingw% cygwin,$(SYSTE
+ 	$(INSTALL) -d -m 0755 "$(DESTDIR)$(BINDIR)"
+ 	$(INSTALL) -m 0755 lib/$(LIB.SHARED.MX) "$(DESTDIR)$(BINDIR)/"
+ else
+-	$(INSTALL) -m 0644 lib/$(LIB.SHARED.MX) "$(DESTDIR)$(LIBDIR)/"
++	$(INSTALL) -m 0755 lib/$(LIB.SHARED.MX) "$(DESTDIR)$(LIBDIR)/"
+ endif
+ ifneq ($(LN),)
+ 	$(LN) $(LIB.SHARED.MX) "$(DESTDIR)$(LIBDIR)/$(LIB.SONAME.MX)"
+diff -up glew-1.10.0/config/Makefile.linux.make glew-1.10.0/config/Makefile.linux
+--- glew-1.10.0/config/Makefile.linux.make	2013-07-23 00:11:22.000000000 +1000
++++ glew-1.10.0/config/Makefile.linux	2013-11-17 18:29:37.557236505 +1000
+@@ -9,14 +9,8 @@ endif
+ ifeq (ppc64,${M_ARCH})
+   ARCH64 = true
+ endif
+-ifeq (${ARCH64},true)
+-  LDFLAGS.EXTRA = -L/usr/X11R6/lib64 -L/usr/lib64
+-  LIBDIR = $(GLEW_DEST)/lib64
+-else
+-  LDFLAGS.EXTRA = -L/usr/X11R6/lib -L/usr/lib
+-  LIBDIR = $(GLEW_DEST)/lib
+-endif
+-LDFLAGS.GL = -lXmu -lXi -lGL -lXext -lX11
++LIBDIR = $(GLEW_DEST)$(libdir)
++LDFLAGS.GL = -lGLU -lGL -lX11
+ LDFLAGS.STATIC = -Wl,-Bstatic
+ LDFLAGS.DYNAMIC = -Wl,-Bdynamic
+ NAME = GLEW

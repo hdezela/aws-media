@@ -1,0 +1,19 @@
+diff -up mesa-demos-6eef979a5488dab01088412f88374b2ea9d615cd/src/demos/Makefile.am.legal mesa-demos-6eef979a5488dab01088412f88374b2ea9d615cd/src/demos/Makefile.am
+--- mesa-demos-6eef979a5488dab01088412f88374b2ea9d615cd/src/demos/Makefile.am.legal	2013-01-08 11:24:38.805867866 -0500
++++ mesa-demos-6eef979a5488dab01088412f88374b2ea9d615cd/src/demos/Makefile.am	2013-01-08 11:24:44.975870107 -0500
+@@ -65,7 +65,6 @@ bin_PROGRAMS = \
+ 	multiarb \
+ 	paltex \
+ 	pixeltest \
+-	pointblast \
+ 	projtex \
+ 	ray \
+ 	readpix \
+@@ -74,7 +73,6 @@ bin_PROGRAMS = \
+ 	shadowtex \
+ 	singlebuffer \
+ 	spectex \
+-	spriteblast \
+ 	stex3d \
+ 	teapot \
+ 	terrain \

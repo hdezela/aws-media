@@ -1,0 +1,3 @@
+# Look to see if the DNSSEC Root key got rolled, if so check trust and update
+
+10 3 1 * * unbound /usr/sbin/unbound-anchor -a /var/lib/unbound/root.anchor -c /etc/unbound/icannbundle.pem

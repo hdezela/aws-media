@@ -1,0 +1,26 @@
+diff -up cups-2.0.3/scheduler/client.c.str4538 cups-2.0.3/scheduler/client.c
+--- cups-2.0.3/scheduler/client.c.str4538	2015-06-25 08:35:22.196788744 +0100
++++ cups-2.0.3/scheduler/client.c	2015-06-25 08:35:38.079786648 +0100
+@@ -2294,6 +2294,9 @@ cupsdSendError(cupsd_client_t *con,	/* I
+                http_status_t  code,	/* I - Error code */
+ 	       int            auth_type)/* I - Authentication type */
+ {
++  char	location[HTTP_MAX_VALUE];	/* Location field */
++
++
+   cupsdLogClient(con, CUPSD_LOG_DEBUG2, "cupsdSendError code=%d, auth_type=%d",
+ 		 code, auth_type);
+ 
+@@ -2326,8 +2329,12 @@ cupsdSendError(cupsd_client_t *con,	/* I
+   * never disable it in that case.
+   */
+ 
++  strlcpy(location, httpGetField(con->http, HTTP_FIELD_LOCATION), sizeof(location));
++
+   httpClearFields(con->http);
+ 
++  httpSetField(con->http, HTTP_FIELD_LOCATION, location);
++
+   if (code >= HTTP_STATUS_BAD_REQUEST && con->type != CUPSD_AUTH_NEGOTIATE)
+     httpSetKeepAlive(con->http, HTTP_KEEPALIVE_OFF);
+ 

@@ -1,0 +1,11 @@
+--- a/configure	Tue Jan 20 06:56:44 2015
++++ b/configure	Sat Jul 04 00:22:06 2015
+@@ -3283,7 +3283,7 @@
+ #pkg-config
+ echo "prefix=$prefix"				 > gpac.pc
+ echo "exec_prefix=\${prefix}"			>> gpac.pc
+-echo "libdir=\${exec_prefix}/$libdir"		>> gpac.pc
++echo "libdir=\$libdir"		>> gpac.pc
+ echo "includedir=\${exec_prefix}/include"	>> gpac.pc
+ echo ""						>> gpac.pc
+ echo "Name: gpac"				>> gpac.pc

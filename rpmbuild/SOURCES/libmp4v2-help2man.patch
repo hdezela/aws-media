@@ -1,0 +1,11 @@
+--- a/doc/GNUmakefile.mk	Fri Jul 03 04:10:20 2015
++++ b/doc/GNUmakefile.mk	Fri Jul 03 04:09:39 2015
+@@ -60,7 +60,7 @@
+ M4.deps  = $(BUILD/)project/project.m4
+ 
+ ifeq ($(FOUND_HELP2MAN),yes)
+-HELP2MAN       = help2man
++HELP2MAN       = help2man --no-discard-stderr
+ HELP2MAN.flags = -m "$(PROJECT_name) Utilities" -N
+ HELP2MAN.cmd   = $(HELP2MAN) $(HELP2MAN.flags) ./$(1) -o $(2)
+ else

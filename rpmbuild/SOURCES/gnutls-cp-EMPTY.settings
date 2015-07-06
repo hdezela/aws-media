@@ -1,0 +1,40 @@
+# A level with no ciphers enabled.
+
+# MACs: None
+# Curves: None
+# Signature algorithms: None
+# Ciphers: None
+# Key exchange: None
+# DH params size:
+# RSA params size:
+# Protocols: None
+
+CONFIG_GNUTLS="SYSTEM=NONE"
+
+# We cannot limit the TLS version number in openssl, thus we cannot disable
+# SSL 3.0, nor specify minimum sizes for DH or RSA parameters.
+CONFIG_OPENSSL=\
+"-ALL"
+
+# Configuration for Bind
+CONFIG_BIND=\
+"disable-algorithms \".\"  {\n"\
+"RSAMD5;\n"\
+"RSA;\n"\
+"DH;\n"\
+"DSA;\n"\
+"RSASHA256;\n"\
+"RSASHA512;\n"\
+"NSEC3DSA;\n"\
+"NSECRSASHA1;\n"\
+"RSASHA1;\n"\
+"ECCGOST\n"\
+"ECDSAP256SHA256\n"\
+"ECDSAP384SHA384\n"\
+"};\n"\
+"disable-ds-digests \".\"  {\n"\
+"SHA1;\n"\
+"SHA-256;\n"\
+"GOST;\n"\
+"SHA-384;\n"\
+"};\n"

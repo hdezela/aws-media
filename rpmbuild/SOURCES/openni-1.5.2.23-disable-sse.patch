@@ -1,0 +1,20 @@
+diff -up ./Platform/Linux/Build/Common/Platform.x86.disable-sse ./Platform/Linux/Build/Common/Platform.x86
+--- ./Platform/Linux/Build/Common/Platform.x86.disable-sse	2013-09-13 20:34:18.023985897 -0400
++++ ./Platform/Linux/Build/Common/Platform.x86	2013-09-13 20:34:48.556164983 -0400
+@@ -2,7 +2,7 @@
+ export GLUT_SUPPORTED=1
+ 
+ ifndef SSE_GENERATION
+-	SSE_GENERATION = 3
++	SSE_GENERATION = 0
+ endif
+ 
+ ifeq ("$(OSTYPE)","Darwin")
+@@ -19,7 +19,5 @@ else
+ 		ifeq ($(SSSE3_ENABLED), 1)
+ 			CFLAGS += -mssse3
+ 		endif
+-	else
+-		DUMMY:=($error "Only SSE2 and SSE3 are supported")
+ 	endif
+ endif

@@ -1,0 +1,13 @@
+diff --git a/lib/libgnutls.map b/lib/libgnutls.map
+index 3dc7ea1..787b16a 100644
+--- a/lib/libgnutls.map
++++ b/lib/libgnutls.map
+@@ -1076,7 +1076,7 @@ GNUTLS_FIPS140_3_4 {
+ 	_gnutls_ecdh_compute_key;
+ };
+ 
+-GNUTLS_PRIVATE {
++GNUTLS_PRIVATE_3_4 {
+   global:
+ 	# Internal symbols needed by libgnutls-openssl:
+ 	_gnutls_pkix1_asn;

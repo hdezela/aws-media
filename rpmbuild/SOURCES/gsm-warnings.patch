@@ -1,0 +1,49 @@
+diff --git a/add-test/add_test.c b/add-test/add_test.c
+index 8e832df..6405178 100644
+--- a/add-test/add_test.c
++++ b/add-test/add_test.c
+@@ -9,6 +9,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <unistd.h>
+ 
+ #include "gsm.h"
+ 
+@@ -29,7 +30,7 @@ word M_gsm_abs P((word op1));
+ longword M_gsm_L_mult P((word op1, word op2));
+ longword M_gsm_L_add P((longword op1, longword op2));
+ 
+-help()
++void help(void)
+ {
+ puts( "  add a b      sub a b     mult a b   div    a b" );
+ puts( "L_add A B    L_sub A B   L_mult A B   mult_r a b" );
+diff --git a/src/code.c b/src/code.c
+index 65dd0a3..402f614 100644
+--- a/src/code.c
++++ b/src/code.c
+@@ -9,8 +9,8 @@
+ #include	"config.h"
+ 
+ 
+-#ifdef	HAS_STDLIB_H
+-#include	<stdlib.h>
++#ifdef	HAS_STRING_H
++#include	<string.h>
+ #else
+ #	include "proto.h"
+ 	extern char	* memcpy P((char *, char *, int));
+diff --git a/src/toast.c b/src/toast.c
+index 9823642..6d4166b 100644
+--- a/src/toast.c
++++ b/src/toast.c
+@@ -6,6 +6,8 @@
+ 
+ /* $Header: /tmp_amd/presto/export/kbs/jutta/src/gsm/RCS/toast.c,v 1.8 1996/07/02 10:41:04 jutta Exp $ */
+ 
++#include	<stdio.h>
++#include	<getopt.h>
+ #include	"toast.h"
+ 
+ /*  toast -- lossy sound compression using the gsm library.

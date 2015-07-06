@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@/ni
+
+Name: OpenNI
+Description: A general purpose driver for all OpenNI cameras.
+Version: @version@
+Cflags: -I${includedir}
+Libs: -L${libdir} -lOpenNI

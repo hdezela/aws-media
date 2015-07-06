@@ -1,0 +1,506 @@
+From patchwork Wed Apr 15 14:08:02 2015
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [Mesa-dev,
+ 1/9] freedreno: use CXX linker rather than explicit link against
+ libstdc++
+From: Emil Velikov <emil.l.velikov@gmail.com>
+X-Patchwork-Id: 47212
+Message-Id: <1429106890-32645-1-git-send-email-emil.l.velikov@gmail.com>
+To: mesa-dev@lists.freedesktop.org
+Cc: emil.l.velikov@gmail.com, Rob Clark <robclark@freedesktop.org>
+Date: Wed, 15 Apr 2015 15:08:02 +0100
+
+Cc: Rob Clark <robclark@freedesktop.org>
+Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
+
+---
+src/gallium/drivers/freedreno/Makefile.am | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/gallium/drivers/freedreno/Makefile.am b/src/gallium/drivers/freedreno/Makefile.am
+index 4b2629f..e798e44 100644
+--- a/src/gallium/drivers/freedreno/Makefile.am
++++ b/src/gallium/drivers/freedreno/Makefile.am
+@@ -21,6 +21,8 @@ libfreedreno_la_SOURCES = \
+ 
+ noinst_PROGRAMS = ir3_compiler
+ 
++# XXX: Required due to the C++ sources in libnir/libglsl_util
++nodist_EXTRA_ir3_compiler_SOURCES = dummy.cpp
+ ir3_compiler_SOURCES = \
+ 	ir3/ir3_cmdline.c
+ 
+@@ -29,7 +31,6 @@ ir3_compiler_LDADD = \
+ 	../../auxiliary/libgallium.la \
+ 	$(top_builddir)/src/glsl/libnir.la \
+ 	$(top_builddir)/src/libglsl_util.la \
+-	-lstdc++ \
+ 	$(top_builddir)/src/util/libmesautil.la \
+ 	$(GALLIUM_COMMON_LIB_DEPS) \
+ 	$(FREEDRENO_LIBS)
+
+From patchwork Wed Apr 15 14:08:03 2015
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [Mesa-dev,
+ 2/9] gallium: use $(top_builddir) when referencing other .la's
+From: Emil Velikov <emil.l.velikov@gmail.com>
+X-Patchwork-Id: 47213
+Message-Id: <1429106890-32645-2-git-send-email-emil.l.velikov@gmail.com>
+To: mesa-dev@lists.freedesktop.org
+Cc: emil.l.velikov@gmail.com
+Date: Wed, 15 Apr 2015 15:08:03 +0100
+
+Just like every other place in gallium.
+
+Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
+
+---
+src/gallium/drivers/freedreno/Makefile.am | 2 +-
+ src/gallium/drivers/nouveau/Makefile.am   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/gallium/drivers/freedreno/Makefile.am b/src/gallium/drivers/freedreno/Makefile.am
+index e798e44..cbf62c6 100644
+--- a/src/gallium/drivers/freedreno/Makefile.am
++++ b/src/gallium/drivers/freedreno/Makefile.am
+@@ -28,7 +28,7 @@ ir3_compiler_SOURCES = \
+ 
+ ir3_compiler_LDADD = \
+ 	libfreedreno.la \
+-	../../auxiliary/libgallium.la \
++	$(top_builddir)/src/gallium/auxiliary/libgallium.la \
+ 	$(top_builddir)/src/glsl/libnir.la \
+ 	$(top_builddir)/src/libglsl_util.la \
+ 	$(top_builddir)/src/util/libmesautil.la \
+diff --git a/src/gallium/drivers/nouveau/Makefile.am b/src/gallium/drivers/nouveau/Makefile.am
+index 0aefc03..d05f0a1 100644
+--- a/src/gallium/drivers/nouveau/Makefile.am
++++ b/src/gallium/drivers/nouveau/Makefile.am
+@@ -48,7 +48,7 @@ nouveau_compiler_SOURCES = \
+ 
+ nouveau_compiler_LDADD = \
+ 	libnouveau.la \
+-	../../auxiliary/libgallium.la \
++	$(top_builddir)/src/gallium/auxiliary/libgallium.la \
+ 	$(top_builddir)/src/util/libmesautil.la \
+ 	$(GALLIUM_COMMON_LIB_DEPS)
+ 
+
+From patchwork Wed Apr 15 14:08:04 2015
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [Mesa-dev,3/9] pipe-loader: add libnir and libglsl_util to the link
+From: Emil Velikov <emil.l.velikov@gmail.com>
+X-Patchwork-Id: 47214
+Message-Id: <1429106890-32645-3-git-send-email-emil.l.velikov@gmail.com>
+To: mesa-dev@lists.freedesktop.org
+Cc: emil.l.velikov@gmail.com, Rob Clark <robclark@freedesktop.org>
+Date: Wed, 15 Apr 2015 15:08:04 +0100
+
+Otherwise we'll error out due to unresolved nir symbols. Note that we
+still fail to link due to unresolved _mesa_error_no_memory().
+
+Based on commit 101142c4010(xa: support for drivers which use NIR)
+
+Cc: Rob Clark <robclark@freedesktop.org>
+Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
+
+---
+src/gallium/targets/pipe-loader/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/gallium/targets/pipe-loader/Makefile.am b/src/gallium/targets/pipe-loader/Makefile.am
+index 967cdb7..e4048b5 100644
+--- a/src/gallium/targets/pipe-loader/Makefile.am
++++ b/src/gallium/targets/pipe-loader/Makefile.am
+@@ -52,6 +52,8 @@ endif
+ 
+ PIPE_LIBS += \
+ 	$(top_builddir)/src/gallium/auxiliary/libgallium.la \
++	$(top_builddir)/src/glsl/libnir.la \
++	$(top_builddir)/src/libglsl_util.la \
+ 	$(top_builddir)/src/util/libmesautil.la \
+ 	$(top_builddir)/src/gallium/drivers/rbug/librbug.la \
+ 	$(top_builddir)/src/gallium/drivers/trace/libtrace.la \
+
+From patchwork Wed Apr 15 14:08:05 2015
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Mesa-dev,4/9] prog;
+ add weak _mesa_error_no_memory() symbol and add it to libglsl_util
+From: Emil Velikov <emil.l.velikov@gmail.com>
+X-Patchwork-Id: 47216
+Message-Id: <1429106890-32645-4-git-send-email-emil.l.velikov@gmail.com>
+To: mesa-dev@lists.freedesktop.org
+Cc: emil.l.velikov@gmail.com, Rob Clark <robclark@freedesktop.org>
+Date: Wed, 15 Apr 2015 15:08:05 +0100
+
+Rather than forcing everyone to provide their own definition of the symbol
+provide a common weak one, which anyone can override if needed.
+
+This resolved the build of the standalone pipe-drivers, as it provides a
+default symbol which was missing previously.
+
+Cc: Rob Clark <robclark@freedesktop.org>
+Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
+
+---
+src/Makefile.am                        |  3 ++-
+ src/glsl/SConscript                    |  2 ++
+ src/mesa/Android.libmesa_glsl_utils.mk |  6 ++++--
+ src/mesa/program/weak_errors.c         | 30 ++++++++++++++++++++++++++++++
+ 4 files changed, 38 insertions(+), 3 deletions(-)
+ create mode 100644 src/mesa/program/weak_errors.c
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 18cb4ce..461da27 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -72,4 +72,5 @@ noinst_LTLIBRARIES = libglsl_util.la
+ libglsl_util_la_SOURCES = \
+ 	mesa/main/imports.c \
+ 	mesa/program/prog_hash_table.c \
+-	mesa/program/symbol_table.c
++	mesa/program/symbol_table.c \
++	mesa/program/weak_errors.c
+diff --git a/src/glsl/SConscript b/src/glsl/SConscript
+index 284b375..d18a8a7 100644
+--- a/src/glsl/SConscript
++++ b/src/glsl/SConscript
+@@ -71,6 +71,7 @@ env.Command('imports.c', '#src/mesa/main/imports.c', Copy('$TARGET', '$SOURCE'))
+ env.Prepend(CPPPATH = ['#src/mesa/program'])
+ env.Command('prog_hash_table.c', '#src/mesa/program/prog_hash_table.c', Copy('$TARGET', '$SOURCE'))
+ env.Command('symbol_table.c', '#src/mesa/program/symbol_table.c', Copy('$TARGET', '$SOURCE'))
++env.Command('weak_errors.c', '#src/mesa/program/weak_errors.c', Copy('$TARGET', '$SOURCE'))
+ 
+ compiler_objs = env.StaticObject(source_lists['GLSL_COMPILER_CXX_FILES'])
+ 
+@@ -78,6 +79,7 @@ mesa_objs = env.StaticObject([
+     'imports.c',
+     'prog_hash_table.c',
+     'symbol_table.c',
++    'weak_errors.c',
+ ])
+ 
+ compiler_objs += mesa_objs
+diff --git a/src/mesa/Android.libmesa_glsl_utils.mk b/src/mesa/Android.libmesa_glsl_utils.mk
+index a9f6ff5..08786e3 100644
+--- a/src/mesa/Android.libmesa_glsl_utils.mk
++++ b/src/mesa/Android.libmesa_glsl_utils.mk
+@@ -43,7 +43,8 @@ LOCAL_C_INCLUDES := \
+ LOCAL_SRC_FILES := \
+ 	main/imports.c \
+ 	program/prog_hash_table.c \
+-	program/symbol_table.c
++	program/symbol_table.c \
++	program/weak_errors.c
+ 
+ include $(MESA_COMMON_MK)
+ include $(BUILD_STATIC_LIBRARY)
+@@ -66,7 +67,8 @@ LOCAL_C_INCLUDES := \
+ LOCAL_SRC_FILES := \
+ 	main/imports.c \
+ 	program/prog_hash_table.c \
+-	program/symbol_table.c
++	program/symbol_table.c \
++	program/weak_errors.c
+ 
+ include $(MESA_COMMON_MK)
+ include $(BUILD_HOST_STATIC_LIBRARY)
+diff --git a/src/mesa/program/weak_errors.c b/src/mesa/program/weak_errors.c
+new file mode 100644
+index 0000000..85c35dc
+--- /dev/null
++++ b/src/mesa/program/weak_errors.c
+@@ -0,0 +1,30 @@
++/*
++ * Copyright © 2014 Intel Corporation
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a
++ * copy of this software and associated documentation files (the "Software"),
++ * to deal in the Software without restriction, including without limitation
++ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the
++ * Software is furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice (including the next
++ * paragraph) shall be included in all copies or substantial portions of the
++ * Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
++ * DEALINGS IN THE SOFTWARE.
++ */
++#include <stdio.h>
++#include "main/errors.h"
++
++__attribute__((weak)) void
++_mesa_error_no_memory(const char *caller)
++{
++   fprintf(stderr, "Mesa error: out of memory in %s", caller);
++}
+
+From patchwork Wed Apr 15 14:08:06 2015
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Mesa-dev,5/9] glsl: use the weak _mesa_error_no_memory() symbol
+From: Emil Velikov <emil.l.velikov@gmail.com>
+X-Patchwork-Id: 47215
+Message-Id: <1429106890-32645-5-git-send-email-emil.l.velikov@gmail.com>
+To: mesa-dev@lists.freedesktop.org
+Cc: emil.l.velikov@gmail.com
+Date: Wed, 15 Apr 2015 15:08:06 +0100
+
+Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
+
+---
+src/glsl/Makefile.am    | 13 ++++---------
+ src/glsl/SConscript     |  2 +-
+ src/glsl/main.cpp       |  6 ------
+ src/glsl/tests/common.c | 30 ------------------------------
+ 4 files changed, 5 insertions(+), 46 deletions(-)
+ delete mode 100644 src/glsl/tests/common.c
+
+diff --git a/src/glsl/Makefile.am b/src/glsl/Makefile.am
+index 23c6fe8..cd37e64 100644
+--- a/src/glsl/Makefile.am
++++ b/src/glsl/Makefile.am
+@@ -89,8 +89,7 @@ tests_general_ir_test_SOURCES =		\
+ 	tests/builtin_variable_test.cpp			\
+ 	tests/invalidate_locations_test.cpp		\
+ 	tests/general_ir_test.cpp			\
+-	tests/varyings_test.cpp				\
+-	tests/common.c
++	tests/varyings_test.cpp
+ tests_general_ir_test_CFLAGS =				\
+ 	$(PTHREAD_CFLAGS)
+ tests_general_ir_test_LDADD =				\
+@@ -103,8 +102,7 @@ tests_uniform_initializer_test_SOURCES =		\
+ 	tests/copy_constant_to_storage_tests.cpp	\
+ 	tests/set_uniform_initializer_tests.cpp		\
+ 	tests/uniform_initializer_utils.cpp		\
+-	tests/uniform_initializer_utils.h		\
+-	tests/common.c
++	tests/uniform_initializer_utils.h
+ tests_uniform_initializer_test_CFLAGS =			\
+ 	$(PTHREAD_CFLAGS)
+ tests_uniform_initializer_test_LDADD =			\
+@@ -114,8 +112,7 @@ tests_uniform_initializer_test_LDADD =			\
+ 	$(PTHREAD_LIBS)
+ 
+ tests_sampler_types_test_SOURCES =			\
+-	tests/sampler_types_test.cpp			\
+-	tests/common.c
++	tests/sampler_types_test.cpp
+ tests_sampler_types_test_CFLAGS =			\
+ 	$(PTHREAD_CFLAGS)
+ tests_sampler_types_test_LDADD =			\
+@@ -133,8 +130,7 @@ libglcpp_la_SOURCES =					\
+ 	$(LIBGLCPP_FILES)
+ 
+ glcpp_glcpp_SOURCES =					\
+-	glcpp/glcpp.c					\
+-	tests/common.c
++	glcpp/glcpp.c
+ glcpp_glcpp_LDADD =					\
+ 	libglcpp.la					\
+ 	$(top_builddir)/src/libglsl_util.la		\
+@@ -164,7 +160,6 @@ glsl_compiler_LDADD =					\
+ 
+ glsl_test_SOURCES = \
+ 	standalone_scaffolding.cpp \
+-	tests/common.c \
+ 	test.cpp \
+ 	test_optpass.cpp \
+ 	test_optpass.h
+diff --git a/src/glsl/SConscript b/src/glsl/SConscript
+index d18a8a7..455f5e8 100644
+--- a/src/glsl/SConscript
++++ b/src/glsl/SConscript
+@@ -117,6 +117,6 @@ env.Alias('glsl_compiler', glsl_compiler)
+ 
+ glcpp = env.Program(
+     target = 'glcpp/glcpp',
+-    source = ['glcpp/glcpp.c', 'tests/common.c'] + mesa_objs,
++    source = ['glcpp/glcpp.c'] + mesa_objs,
+ )
+ env.Alias('glcpp', glcpp)
+diff --git a/src/glsl/main.cpp b/src/glsl/main.cpp
+index ccac839..fc54ddd 100644
+--- a/src/glsl/main.cpp
++++ b/src/glsl/main.cpp
+@@ -41,12 +41,6 @@
+ 
+ static int glsl_version = 330;
+ 
+-extern "C" void
+-_mesa_error_no_memory(const char *caller)
+-{
+-   fprintf(stderr, "Mesa error: out of memory in %s", caller);
+-}
+-
+ static void
+ initialize_context(struct gl_context *ctx, gl_api api)
+ {
+diff --git a/src/glsl/tests/common.c b/src/glsl/tests/common.c
+deleted file mode 100644
+index d69f54d..0000000
+--- a/src/glsl/tests/common.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/*
+- * Copyright © 2014 Intel Corporation
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a
+- * copy of this software and associated documentation files (the "Software"),
+- * to deal in the Software without restriction, including without limitation
+- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+- * and/or sell copies of the Software, and to permit persons to whom the
+- * Software is furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice (including the next
+- * paragraph) shall be included in all copies or substantial portions of the
+- * Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- */
+-#include <stdio.h>
+-#include "main/errors.h"
+-
+-void
+-_mesa_error_no_memory(const char *caller)
+-{
+-   fprintf(stderr, "Mesa error: out of memory in %s", caller);
+-}
+
+From patchwork Wed Apr 15 14:08:07 2015
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [Mesa-dev,
+ 6/9] freedreno/ir3: use the weak _mesa_error_no_memory() symbol
+From: Emil Velikov <emil.l.velikov@gmail.com>
+X-Patchwork-Id: 47218
+Message-Id: <1429106890-32645-6-git-send-email-emil.l.velikov@gmail.com>
+To: mesa-dev@lists.freedesktop.org
+Cc: emil.l.velikov@gmail.com, Rob Clark <robclark@freedesktop.org>
+Date: Wed, 15 Apr 2015 15:08:07 +0100
+
+We no longer need to (although we can) provide this symbol ourselves.
+
+Cc: Rob Clark <robclark@freedesktop.org>
+Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
+
+---
+src/gallium/drivers/freedreno/ir3/ir3_cmdline.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/src/gallium/drivers/freedreno/ir3/ir3_cmdline.c b/src/gallium/drivers/freedreno/ir3/ir3_cmdline.c
+index d0517aa..0b16cc1 100644
+--- a/src/gallium/drivers/freedreno/ir3/ir3_cmdline.c
++++ b/src/gallium/drivers/freedreno/ir3/ir3_cmdline.c
+@@ -360,11 +360,3 @@ int main(int argc, char **argv)
+ 	}
+ 	dump_info(&v, info);
+ }
+-
+-void _mesa_error_no_memory(const char *caller);
+-
+-void
+-_mesa_error_no_memory(const char *caller)
+-{
+-	fprintf(stderr, "Mesa error: out of memory in %s", caller);
+-}
+
+From patchwork Wed Apr 15 14:08:08 2015
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [Mesa-dev,7/9] st/xa: use the weak _mesa_error_no_memory() symbol
+From: Emil Velikov <emil.l.velikov@gmail.com>
+X-Patchwork-Id: 47217
+Message-Id: <1429106890-32645-7-git-send-email-emil.l.velikov@gmail.com>
+To: mesa-dev@lists.freedesktop.org
+Cc: emil.l.velikov@gmail.com, Rob Clark <robclark@freedesktop.org>
+Date: Wed, 15 Apr 2015 15:08:08 +0100
+
+Thus we can remove the workaround that we previously had.
+
+Cc: Rob Clark <robclark@freedesktop.org>
+Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
+
+---
+src/gallium/state_trackers/xa/xa_tracker.c | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/src/gallium/state_trackers/xa/xa_tracker.c b/src/gallium/state_trackers/xa/xa_tracker.c
+index 8901998..f69ac8e 100644
+--- a/src/gallium/state_trackers/xa/xa_tracker.c
++++ b/src/gallium/state_trackers/xa/xa_tracker.c
+@@ -535,15 +535,3 @@ xa_surface_format(const struct xa_surface *srf)
+ {
+     return srf->fdesc.xa_format;
+ }
+-
+-/*
+- * _mesa_error_no_memory() is expected by NIR to be provided by the
+- * user.  Normally this is in mesa st, but other state trackers
+- * must provide their own.
+- */
+-void _mesa_error_no_memory(const char *caller);
+-void
+-_mesa_error_no_memory(const char *caller)
+-{
+-	debug_printf("Mesa error: out of memory in %s", caller);
+-}
+
+From patchwork Wed Apr 15 14:08:09 2015
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [Mesa-dev,8/9] targets/nine: link against libnir/libglsl_util
+From: Emil Velikov <emil.l.velikov@gmail.com>
+X-Patchwork-Id: 47219
+Message-Id: <1429106890-32645-8-git-send-email-emil.l.velikov@gmail.com>
+To: mesa-dev@lists.freedesktop.org
+Cc: emil.l.velikov@gmail.com
+Date: Wed, 15 Apr 2015 15:08:09 +0100
+
+Similar to commit 127f8767e0a and 101142c4010.
+
+Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
+
+---
+src/gallium/targets/d3dadapter9/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/gallium/targets/d3dadapter9/Makefile.am b/src/gallium/targets/d3dadapter9/Makefile.am
+index 1dc55f5..591978f 100644
+--- a/src/gallium/targets/d3dadapter9/Makefile.am
++++ b/src/gallium/targets/d3dadapter9/Makefile.am
+@@ -74,6 +74,8 @@ endif # HAVE_LD_VERSION_SCRIPT
+ d3dadapter9_la_LIBADD = \
+ 	$(top_builddir)/src/gallium/auxiliary/libgalliumvl_stub.la \
+ 	$(top_builddir)/src/gallium/auxiliary/libgallium.la \
++	$(top_builddir)/src/glsl/libnir.la \
++	$(top_builddir)/src/libglsl_util.la \
+ 	$(top_builddir)/src/gallium/state_trackers/nine/libninetracker.la \
+ 	$(top_builddir)/src/util/libmesautil.la \
+ 	$(top_builddir)/src/gallium/winsys/sw/wrapper/libwsw.la \

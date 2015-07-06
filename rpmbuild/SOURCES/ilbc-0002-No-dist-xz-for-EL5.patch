@@ -1,0 +1,26 @@
+From d4026f841ee2bef5faa6301f445f670f12434a4a Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Thu, 2 Aug 2012 14:29:17 +0400
+Subject: [PATCH 2/3] No dist-xz for EL5
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1717034..30c38fc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4,7 +4,7 @@
+ AC_INIT([libilbc], [1.1.1], [])
+ AC_CONFIG_AUX_DIR(.)
+ AC_CONFIG_MACRO_DIR([m4])
+-AM_INIT_AUTOMAKE([tar-ustar dist-xz])
++AM_INIT_AUTOMAKE([tar-ustar dist-bzip2 no-dist-gzip])
+ AC_CONFIG_HEADERS([config.h])
+ 
+ # Cross compiling support
+-- 
+1.7.11.2
+

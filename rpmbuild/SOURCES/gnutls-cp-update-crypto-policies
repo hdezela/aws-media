@@ -1,0 +1,132 @@
+#!/bin/sh
+
+umask 022
+
+profile_dir=/usr/share/crypto-policies/profiles
+base_dir=/etc/crypto-policies
+backend_config_dir=$base_dir/back-ends
+errcode=0
+nocheck=0
+
+if test $# -ge 1;then
+	case "$1" in
+		--no-check)
+			nocheck=1
+			;;
+		--show)
+			cat $base_dir/config|grep -v "^#"|sed '/^$/d'
+			exit 0
+			;;
+		*)
+			echo "usage: $0 --show"
+			echo "usage: $0 --no-check"
+			echo "usage: $0"
+			exit 0
+			;;
+	esac
+fi
+
+mkdir -p $backend_config_dir >/dev/null 2>&1
+
+gnutls_config_file=$backend_config_dir/gnutls.config
+openssl_config_file=$backend_config_dir/openssl.config
+nss_config_file=$backend_config_dir/nss.config
+bind_config_file=$backend_config_dir/bind.config
+
+profile=`cat $base_dir/config|grep -v ^#`
+
+if test -z "$profile";then
+	#try the OS-installed profile
+	profile=`cat /usr/share/crypto-policies/default-config|grep -v ^#`
+	if test -z "$profile";then
+		echo "Couldn't read current profile"
+		exit 1
+	fi
+fi
+
+# Note that as default policies are updated to reflect advances
+# in crypto, the old policies should be renamed to NAME-F?? to
+# allow new systems to interoperate with old ones, by using a
+# profile that is acceptable in the old system (F?? is the fedora
+# release that used that same profile as default).
+
+# Overall, key exchange methods that offer forward secrecy are 
+# preferred, but for compatibility reasons, the TLS RSA is prioritized
+# over DHE-RSA.
+
+if ! test -f $profile_dir/$profile.settings;then
+	echo "Unknown profile: $profile"
+	exit 1
+fi
+
+. $profile_dir/$profile.settings
+
+# Generate policy for GnuTLS
+touch $gnutls_config_file.tmp >/dev/null 2>&1
+if ! test -f $gnutls_config_file.tmp;then
+	echo "Cannot write to $backend_config_dir. This program requires administrator permissions."
+	exit 1
+fi
+echo -e $CONFIG_GNUTLS > $gnutls_config_file.tmp
+
+# Test policies
+if test nocheck = 0 && test -x /usr/bin/gnutls-cli;then
+	gnutls-cli -l --priority `cat $gnutls_config_file.tmp|sed 's/SYSTEM=//g'` >/dev/null 2>&1
+	if test $? != 0;then
+		echo "There is an error in $gnutls_config_file.tmp"
+		echo "Couldn't update policy for GnuTLS"
+		errcode=1
+	fi
+fi
+
+# Generate policy for openssl
+touch $openssl_config_file.tmp >/dev/null 2>&1
+if ! test -f $openssl_config_file.tmp;then
+	echo "Cannot write to $backend_config_dir. This program requires administrator permissions."
+	exit 1
+fi
+echo -e $CONFIG_OPENSSL > $openssl_config_file.tmp 2>&1
+
+# Test policies
+if test nocheck = 0 && test -x /usr/bin/openssl;then
+	openssl ciphers `cat $openssl_config_file.tmp` >/dev/null 2>&1
+	if test $? != 0;then
+		echo "Couldn't update policy for OpenSSL"
+		echo "There is an error in $openssl_config_file.tmp"
+		errcode=1
+	fi
+fi
+
+# Generate policy for bind
+touch $bind_config_file.tmp >/dev/null 2>&1
+if ! test -f $bind_config_file.tmp;then
+	echo "Cannot write to $backend_config_dir. This program requires administrator permissions."
+	exit 1
+fi
+echo -e $CONFIG_BIND > $bind_config_file.tmp 2>&1
+
+# Test policies
+if test nocheck = 0 && test -x /usr/sbin/named-checkconf;then
+	/usr/sbin/named-checkconf >/dev/null 2>&1
+	if test $? != 0;then
+		echo "Couldn't update policy for BIND"
+		echo "There is an error in $bind_config_file.tmp"
+		errcode=1
+	fi
+fi
+
+# update all the files
+if test $errcode = 0;then
+	mv $openssl_config_file.tmp $openssl_config_file
+	mv $gnutls_config_file.tmp $gnutls_config_file
+	mv $bind_config_file.tmp $bind_config_file
+fi
+
+if test -e /usr/lib/systemd/system/bind.service;then
+	systemctl reload bind
+fi
+
+# Old versions seemed to install that file. We no longer use it
+rm -f $base_dir/current
+
+exit $errcode

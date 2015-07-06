@@ -1,0 +1,38 @@
+# A reasonable default for today's standards. For F21 it should provide
+# 80-bit security and will include for compatibility and as fallback the RC4
+# cipher which is known to be broken.
+
+# MACs: SHA1+
+# Curves: All supported
+# Signature algorithms: must use SHA-1 hash or better
+# Ciphers: AES-GCM, AES-CBC, CAMELLIA-GCM, CAMELLIA-CBC, 3DES-CBC, RC4
+#   (Note that AES256 should be prioritized after AES128 to conserve resources.)
+# Key exchange: ECDHE, RSA, DHE
+# DH params size: 1023+
+# RSA params size: 1023+
+# Protocols: All supported (SSL3.0+)
+
+CONFIG_GNUTLS="SYSTEM=NONE:+VERS-TLS-ALL:"\
+"+AEAD:+SHA1:+SHA256:+SHA384:"\
+"+ECDHE-RSA:+ECDHE-ECDSA:+RSA:+DHE-RSA:+DHE-DSS:"\
+"+AES-128-GCM:+AES-128-CBC:+CAMELLIA-128-GCM:+CAMELLIA-128-CBC:"\
+"+AES-256-GCM:+AES-256-CBC:+CAMELLIA-256-GCM:+CAMELLIA-256-CBC:"\
+"+3DES-CBC:+ARCFOUR-128:"\
+"+SIGN-ALL:-SIGN-RSA-MD5:"\
+"+CURVE-ALL:+COMP-NULL:%PROFILE_LOW"
+
+# We cannot limit the TLS version number in openssl, thus we cannot disable
+# SSL 3.0, nor specify minimum sizes for DH or RSA parameters.
+CONFIG_OPENSSL=\
+"!SSLv2:kEECDH:kRSA:kEDH:kPSK:"\
+"+CAMELLIA128:+AES256:+CAMELLIA256:+3DES:+RC4:"\
+"!aNULL:!eNULL:!MD5:!EXP:!SEED:!IDEA:!DES"
+
+
+# Configuration for Bind
+CONFIG_BIND=\
+"disable-algorithms \".\"  {\n"\
+"RSAMD5;\n"\
+"};\n" \
+
+

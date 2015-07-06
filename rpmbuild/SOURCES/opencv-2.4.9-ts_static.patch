@@ -1,0 +1,12 @@
+diff -up opencv-2.4.9/modules/ts/CMakeLists.txt.ts_static opencv-2.4.9/modules/ts/CMakeLists.txt
+--- opencv-2.4.9/modules/ts/CMakeLists.txt.ts_static	2014-04-11 05:15:26.000000000 -0500
++++ opencv-2.4.9/modules/ts/CMakeLists.txt	2014-06-29 12:49:29.473910506 -0500
+@@ -4,7 +4,7 @@ if(IOS)
+   ocv_module_disable(ts)
+ endif()
+ 
+-set(OPENCV_MODULE_TYPE STATIC)
++#set(OPENCV_MODULE_TYPE STATIC)
+ set(OPENCV_MODULE_IS_PART_OF_WORLD FALSE)
+ 
+ ocv_warnings_disable(CMAKE_CXX_FLAGS -Wundef)

@@ -1,0 +1,19 @@
+--- a/configure	Sun Jul 05 03:04:53 2015
++++ b/configure	Sun Jul 05 03:20:38 2015
+@@ -4474,7 +4474,7 @@
+ 
+ 
+ 
+-ac_config_files="$ac_config_files config/config config/system.mak"
++ac_config_files="$ac_config_files config/config config/system.mak flite.pc"
+ 
+ cat >confcache <<\_ACEOF
+ # This file is a shell script that caches the results of configure
+@@ -5185,6 +5185,7 @@
+   case $ac_config_target in
+     "config/config") CONFIG_FILES="$CONFIG_FILES config/config" ;;
+     "config/system.mak") CONFIG_FILES="$CONFIG_FILES config/system.mak" ;;
++    "flite.pc") CONFIG_FILES="$CONFIG_FILES flite.pc" ;;
+ 
+   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
+   esac

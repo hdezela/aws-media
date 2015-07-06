@@ -1,0 +1,13 @@
+diff -up mesa-20140824/src/gallium/auxiliary/util/u_math.h.be mesa-20140824/src/gallium/auxiliary/util/u_math.h
+--- mesa-20140824/src/gallium/auxiliary/util/u_math.h.be	2014-08-28 15:30:32.560480333 +0200
++++ mesa-20140824/src/gallium/auxiliary/util/u_math.h	2014-08-28 15:30:56.275479755 +0200
+@@ -55,6 +55,9 @@ extern "C" {
+ #include <strings.h> /* for ffs */
+ #endif
+ 
++#ifdef PIPE_ARCH_BIG_ENDIAN
++#include <assert.h>
++#endif
+ 
+ #ifndef M_SQRT2
+ #define M_SQRT2 1.41421356237309504880

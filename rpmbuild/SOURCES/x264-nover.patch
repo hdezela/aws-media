@@ -1,0 +1,11 @@
+--- ./configure.nover	2012-11-18 05:31:06.000000000 +0000
++++ ./configure	2012-11-19 01:44:23.790190057 +0000
+@@ -1147,7 +1147,7 @@ fi
+ echo "LDFLAGSCLI = $LDFLAGSCLI" >> config.mak
+ echo "CLI_LIBX264 = $CLI_LIBX264" >> config.mak
+ 
+-${SRCPATH}/version.sh "${SRCPATH}" >> x264_config.h
++cat ${SRCPATH}/version.h >> ${SRCPATH}/x264_config.h
+ 
+ cat > x264.pc << EOF
+ prefix=$prefix

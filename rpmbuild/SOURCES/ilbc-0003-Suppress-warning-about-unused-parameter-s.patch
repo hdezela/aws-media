@@ -1,0 +1,28 @@
+From 6c707358b629691338e04403a9f53ab1b0aac7f8 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Thu, 2 Aug 2012 14:38:18 +0400
+Subject: [PATCH 3/3] Suppress warning about unused parameter(s)
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ signal_processing/filter_ar.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/signal_processing/filter_ar.c b/signal_processing/filter_ar.c
+index 24e83a6..9228736 100644
+--- a/signal_processing/filter_ar.c
++++ b/signal_processing/filter_ar.c
+@@ -29,6 +29,10 @@ int WebRtcSpl_FilterAR(G_CONST WebRtc_Word16* a,
+                        WebRtc_Word16* filtered_low,
+                        int filtered_low_length)
+ {
++
++	(void) state_low_length;
++	(void) filtered_low_length;
++
+     WebRtc_Word32 o;
+     WebRtc_Word32 oLOW;
+     int i, j, stop;
+-- 
+1.7.11.2
+

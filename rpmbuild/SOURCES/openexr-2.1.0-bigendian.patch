@@ -1,0 +1,63 @@
+diff -up openexr-2.1.0/IlmImfTest/testFutureProofing.cpp.bigendian openexr-2.1.0/IlmImfTest/testFutureProofing.cpp
+--- openexr-2.1.0/IlmImfTest/testFutureProofing.cpp.bigendian	2013-11-11 17:09:51.000000000 -0600
++++ openexr-2.1.0/IlmImfTest/testFutureProofing.cpp	2013-11-27 08:43:55.486026741 -0600
+@@ -40,6 +40,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <assert.h>
++#include <byteswap.h>
+ 
+ #include "tmpDir.h"
+ #include "testFutureProofing.h"
+@@ -64,6 +65,7 @@
+ #include <ImfNamespace.h>
+ #include <ImathNamespace.h>
+ #include <IlmThreadNamespace.h>
++#include <ImfSystemSpecific.h>
+ 
+ namespace IMF = OPENEXR_IMF_NAMESPACE;
+ using namespace IMF;
+@@ -1234,6 +1236,12 @@ modifyType (bool modify_version)
+             
+             //length of attribute
+             fread(&length,4,1,f);
++            if (!GLOBAL_SYSTEM_LITTLE_ENDIAN)
++            {
++                int tmp = bswap_32(length);
++        	length = tmp;
++            }
++
+             if(!modify_version && attrib_name=="type")
+             {
+                 // modify the type of part 1 to be 'X<whatevever>'
+diff -up openexr-2.1.0/IlmImfTest/testMultiPartFileMixingBasic.cpp.bigendian openexr-2.1.0/IlmImfTest/testMultiPartFileMixingBasic.cpp
+--- openexr-2.1.0/IlmImfTest/testMultiPartFileMixingBasic.cpp.bigendian	2013-11-11 17:09:52.000000000 -0600
++++ openexr-2.1.0/IlmImfTest/testMultiPartFileMixingBasic.cpp	2013-11-27 08:44:19.370775892 -0600
+@@ -40,6 +40,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <assert.h>
++#include <byteswap.h>
+ 
+ #include "tmpDir.h"
+ #include "testMultiPartFileMixingBasic.h"
+@@ -59,6 +60,7 @@
+ #include <ImfDeepScanLineInputPart.h>
+ #include <ImfPartType.h>
+ #include <ImfMisc.h>
++#include <ImfSystemSpecific.h>
+ 
+ namespace IMF = OPENEXR_IMF_NAMESPACE;
+ using namespace IMF;
+@@ -1383,6 +1385,11 @@ killOffsetTables (const std::string & fn
+             
+             //length of attribute
+             fread(&length,4,1,f);
++    	    if (!GLOBAL_SYSTEM_LITTLE_ENDIAN)
++    	    {
++    		int tmp = bswap_32(length);
++    		length = tmp;
++    	    }
+             
+             //value of attribute
+             for(int i=0;i<length;i++) 

@@ -1,0 +1,43 @@
+From 81464652d2453c608bbbb52fd59e9e9f20857178 Mon Sep 17 00:00:00 2001
+From: Constantin Rack <constantin@rack.li>
+Date: Tue, 23 Jun 2015 08:29:36 +0200
+Subject: [PATCH] Solution: allow brackets in tcp address. Fixes #43
+
+---
+ src/socket_base.cpp            | 5 +++--
+ tests/test_connect_resolve.cpp | 3 +++
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/socket_base.cpp b/src/socket_base.cpp
+index bff7068..f79af6f 100644
+--- a/src/socket_base.cpp
++++ b/src/socket_base.cpp
+@@ -603,11 +603,12 @@ int zmq::socket_base_t::connect (const char *addr_)
+         //  Following code is quick and dirty check to catch obvious errors,
+         //  without trying to be fully accurate.
+         const char *check = address.c_str ();
+-        if (isalnum (*check) || isxdigit (*check)) {
++        if (isalnum (*check) || isxdigit (*check) || *check == '[') {
+             check++;
+             while (isalnum  (*check)
+                 || isxdigit (*check)
+-                || *check == '.' || *check == '-' || *check == ':'|| *check == ';')
++                || *check == '.' || *check == '-' || *check == ':'|| *check == ';'
++                || *check == ']')
+                 check++;
+         }
+         //  Assume the worst, now look for success
+diff --git a/tests/test_connect_resolve.cpp b/tests/test_connect_resolve.cpp
+index f9a7b9d..cb5353f 100644
+--- a/tests/test_connect_resolve.cpp
++++ b/tests/test_connect_resolve.cpp
+@@ -41,6 +41,9 @@ int main (void)
+     int rc = zmq_connect (sock, "tcp://localhost:1234");
+     assert (rc == 0);
+ 
++    rc = zmq_connect (sock, "tcp://[::1]:4506");
++    assert (rc == 0);
++
+     rc = zmq_connect (sock, "tcp://localhost:invalid");
+     assert (rc == -1);
+ 

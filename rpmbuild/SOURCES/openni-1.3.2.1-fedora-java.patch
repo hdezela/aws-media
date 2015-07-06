@@ -1,0 +1,16 @@
+diff -urN openni-1.3.2.1-gitf8467404/Wrappers/OpenNI.java/src/org/openni/NativeMethods.java openni-1.3.2.1-gitf8467404.fedora-java/Wrappers/OpenNI.java/src/org/openni/NativeMethods.java
+--- openni-1.3.2.1-gitf8467404/Wrappers/OpenNI.java/src/org/openni/NativeMethods.java	2011-07-13 21:35:20.000000000 +0200
++++ openni-1.3.2.1-gitf8467404.fedora-java/Wrappers/OpenNI.java/src/org/openni/NativeMethods.java	2011-08-30 15:00:59.107807852 +0200
+@@ -6,11 +6,7 @@
+ {
+ 	static 
+ 	{ 
+-		String arch = System.getenv("PROCESSOR_ARCHITECTURE");
+-		if ((arch != null) && ((arch.equals("AMD64")) || (arch.equals("IA64"))))
+-			System.loadLibrary("OpenNI.jni64"); 
+-		else
+-			System.loadLibrary("OpenNI.jni");
++		System.load("@LIBDIR@/OpenNI.jni.so"); 
+ 	}
+ 
+ 	// Marshaling

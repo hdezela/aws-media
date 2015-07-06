@@ -1,0 +1,92 @@
+commit 9be0e1fa97c0f6f26dcc1d227665105e1ac231bf
+Author: wouter <wouter@be551aaa-1e26-0410-a405-d3ace91eadb9>
+Date:   Mon Jan 5 09:13:32 2015 +0000
+
+    - getauxval test for ppc64 linux compatibility.
+    
+    
+    git-svn-id: http://unbound.nlnetlabs.nl/svn/trunk@3293 be551aaa-1e26-0410-a405-d3ace91eadb9
+
+diff --git a/compat/getentropy_linux.c b/compat/getentropy_linux.c
+index 32d58a7..60e010d 100644
+--- a/compat/getentropy_linux.c
++++ b/compat/getentropy_linux.c
+@@ -474,22 +474,24 @@ getentropy_fallback(void *buf, size_t len)
+ 
+ 			HD(cnt);
+ 		}
+-#ifdef AT_RANDOM
++#ifdef HAVE_GETAUXVAL
++#  ifdef AT_RANDOM
+ 		/* Not as random as you think but we take what we are given */
+ 		p = (char *) getauxval(AT_RANDOM);
+ 		if (p)
+ 			HR(p, 16);
+-#endif
+-#ifdef AT_SYSINFO_EHDR
++#  endif
++#  ifdef AT_SYSINFO_EHDR
+ 		p = (char *) getauxval(AT_SYSINFO_EHDR);
+ 		if (p)
+ 			HR(p, pgs);
+-#endif
+-#ifdef AT_BASE
++#  endif
++#  ifdef AT_BASE
+ 		p = (char *) getauxval(AT_BASE);
+ 		if (p)
+ 			HD(p);
+-#endif
++#  endif
++#endif /* HAVE_GETAUXVAL */
+ 
+ 		SHA512_Final(results, &ctx);
+ 		memcpy((char*)buf + i, results, min(sizeof(results), len - i));
+diff --git a/config.h.in b/config.h.in
+index 2b7770b..1be23c3 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -146,6 +146,9 @@
+ /* Whether getaddrinfo is available */
+ #undef HAVE_GETADDRINFO
+ 
++/* Define to 1 if you have the `getauxval' function. */
++#undef HAVE_GETAUXVAL
++
+ /* Define to 1 if you have the `getentropy' function. */
+ #undef HAVE_GETENTROPY
+ 
+diff --git a/configure b/configure
+index e02f2bb..1d230bd 100755
+--- a/configure
++++ b/configure
+@@ -18256,6 +18256,17 @@ fi
+ 
+ done
+ 
++				for ac_func in getauxval
++do :
++  ac_fn_c_check_func "$LINENO" "getauxval" "ac_cv_func_getauxval"
++if test "x$ac_cv_func_getauxval" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE_GETAUXVAL 1
++_ACEOF
++
++fi
++done
++
+ 				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing clock_gettime" >&5
+ $as_echo_n "checking for library containing clock_gettime... " >&6; }
+ if ${ac_cv_search_clock_gettime+:} false; then :
+diff --git a/configure.ac b/configure.ac
+index 2405563..df59227 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1021,6 +1021,7 @@ if test "$USE_NSS" = "no"; then
+ 					AC_LIBOBJ(sha512)
+ 				])
+ 				AC_CHECK_HEADERS([sys/sysctl.h],,, [AC_INCLUDES_DEFAULT])
++				AC_CHECK_FUNCS([getauxval])
+ 				AC_SEARCH_LIBS([clock_gettime], [rt])
+ 			;;
+ 			esac

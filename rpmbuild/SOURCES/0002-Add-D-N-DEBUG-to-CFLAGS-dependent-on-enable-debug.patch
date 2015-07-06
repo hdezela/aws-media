@@ -1,0 +1,35 @@
+From 069211570c32a8d5848e127975a2943e9d8fc6b9 Mon Sep 17 00:00:00 2001
+From: Matt Turner <mattst88@gmail.com>
+Date: Thu, 21 Feb 2013 20:40:31 -0800
+Subject: [PATCH 2/2] Add -D(N)DEBUG to CFLAGS dependent on --enable-debug
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Tested-by: Blaž Hrastnik <speed.the.bboy@gmail.com>
+Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=61003
+---
+ configure.ac | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index cbfd047..45abf17 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -42,9 +42,10 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+ AC_ARG_ENABLE(debug,
+               AS_HELP_STRING([--enable-debug],
+                 [Enable debugging information]),
+-              [CFLAGS="$CFLAGS -g -O0"
+-               CXXFLAGS="$CXXFLAGS -g -O0"],
+-              [])
++              [CFLAGS="$CFLAGS -g -O0 -DDEBUG"
++               CXXFLAGS="$CXXFLAGS -g -O0 -DDEBUG"],
++              [CFLAGS="$CFLAGS -DNDEBUG"
++               CXXFLAGS="$CXXFLAGS -DNDEBUG"])
+ 
+ dnl Make sure the pkg-config macros are defined
+ m4_ifndef([PKG_PROG_PKG_CONFIG],
+-- 
+1.8.3.1
+

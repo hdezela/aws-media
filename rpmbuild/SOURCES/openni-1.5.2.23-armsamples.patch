@@ -1,0 +1,22 @@
+diff -up ./Platform/Linux/CreateRedist/Redist_OpenNi.py.armsamples ./Platform/Linux/CreateRedist/Redist_OpenNi.py
+--- ./Platform/Linux/CreateRedist/Redist_OpenNi.py.armsamples	2013-09-15 00:09:24.809941045 -0400
++++ ./Platform/Linux/CreateRedist/Redist_OpenNi.py	2013-09-15 00:09:43.265631930 -0400
+@@ -346,12 +346,12 @@ if PLATFORM == 'CE4100':
+     samples_list.remove('NiViewer')
+     samples_list.remove('NiSimpleViewer')
+ 
+-if PLATFORM == 'Arm':
+-    samples_list.remove('NiUserTracker')
+-    samples_list.remove('NiViewer')
+-    samples_list.remove('NiSimpleViewer')
+-    samples_list.remove('NiHandTracker')
+-    samples_list.remove('NiUserSelection')
++#if PLATFORM == 'Arm':
++#    samples_list.remove('NiUserTracker')
++#    samples_list.remove('NiViewer')
++#    samples_list.remove('NiSimpleViewer')
++#    samples_list.remove('NiHandTracker')
++#    samples_list.remove('NiUserSelection')
+ 
+ if (MonoDetected == 0):
+     samples_list.remove("SimpleRead.net")

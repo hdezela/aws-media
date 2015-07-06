@@ -1,0 +1,9 @@
+ - Clean up and organize packages
+   + Enable cross-dependencies for late-added packages (libvdpau for example)
+   + Re-order package build process to minimize package substitution (i.e. if libfoo is needed and its built locally, make it the first install and not an update)
+   + Fix a few errors that required disabling some things (flite, quvi...)
+ - Double check all specs to include "Obsoletes" for those that update AMZ1 packages
+ - Remove debug package from all specs
+ - Add static packages to all specs
+ - Write an automated build script
+ 

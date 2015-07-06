@@ -1,0 +1,214 @@
+diff -up ./Include/XnCppWrapper.h.willow ./Include/XnCppWrapper.h
+--- ./Include/XnCppWrapper.h.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Include/XnCppWrapper.h	2015-01-05 20:00:00.962545722 -0500
+@@ -202,7 +202,7 @@ namespace xn
+ 		 *
+ 		 * @param [in]	ppData	A pointer to the data member of the meta data object.
+ 		 */
+-		inline OutputMetaData(const XnUInt8** ppData) : m_ppData(ppData), m_nAllocatedSize(0), m_pAllocatedData(NULL)
++		inline OutputMetaData(const XnUInt8** ppData) : m_pAllocatedData(NULL), m_ppData(ppData), m_nAllocatedSize(0)
+ 		{
+ 			xnOSMemSet(&m_output, 0, sizeof(XnOutputMetaData));
+ 		}
+@@ -1980,7 +1980,7 @@ namespace xn
+ 			xnNodeQueryAllocate(&m_pQuery);
+ 		}
+ 
+-		inline Query(XnNodeQuery* pNodeQuery) : m_bAllocated(FALSE), m_pQuery(pNodeQuery)
++		inline Query(XnNodeQuery* pNodeQuery) : m_pQuery(pNodeQuery), m_bAllocated(FALSE)
+ 		{
+ 		}
+ 
+@@ -6614,6 +6614,7 @@ namespace xn
+ 		 */
+ 		inline XnBool IsCalibrated(XnUserID user) const
+ 		{
++
+ 			return xnIsSkeletonCalibrated(GetHandle(), user);
+ 		}
+ 
+@@ -8435,7 +8436,7 @@ private:
+ 		/**
+ 		 * Ctor
+ 		 */
+-		inline EnumerationErrors() : m_bAllocated(TRUE), m_pErrors(NULL) { xnEnumerationErrorsAllocate(&m_pErrors); }
++		inline EnumerationErrors() : m_bAllocated(TRUE) { xnEnumerationErrorsAllocate(&m_pErrors); }
+ 
+ 		/**
+ 		 * Ctor
+@@ -8444,7 +8445,7 @@ private:
+ 		 * @param [in]	bOwn		TRUE to own the object (i.e. free it upon destruction), FALSE
+ 		 * 							otherwise.
+ 		 */
+-		inline EnumerationErrors(XnEnumerationErrors* pErrors, XnBool bOwn = FALSE) : m_bAllocated(bOwn), m_pErrors(pErrors) {}
++		inline EnumerationErrors(XnEnumerationErrors* pErrors, XnBool bOwn = FALSE) : m_pErrors(pErrors), m_bAllocated(bOwn) {}
+ 
+ 		/**
+ 		 * Dtor
+diff -up ./Include/XnOS.h.willow ./Include/XnOS.h
+--- ./Include/XnOS.h.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Include/XnOS.h	2015-01-05 20:00:00.963545761 -0500
+@@ -48,7 +48,11 @@
+ #elif defined(_ARC)
+ 	#include "ARC/XnOSARC.h"
+ #else
+-	#error OpenNI OS Abstraction Layer - Unsupported Platform!
++	#if defined __INTEL_COMPILER
++		#include "Linux-x86/XnOSLinux.h" 
++	#else
++		#error OpenNI OS Abstraction Layer - Unsupported Platform!
++	#endif
+ #endif
+ 
+ //---------------------------------------------------------------------------
+diff -up ./Include/XnPlatform.h.willow ./Include/XnPlatform.h
+--- ./Include/XnPlatform.h.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Include/XnPlatform.h	2015-01-05 20:00:00.963545761 -0500
+@@ -68,11 +68,16 @@
+ #elif _ARC
+ 	#include "ARC/XnPlatformARC.h"
+ #elif (__APPLE__)
+-	#include "MacOSX/XnPlatformMacOSX.h"
++    #include "MacOSX/XnPlatformMacOSX.h" 
+ #else
+-	#error OpenNI Platform Abstraction Layer - Unsupported Platform!
++ #if defined __INTEL_COMPILER
++   #include "Linux/XnPlatformLinux.h" 
++ #else
++    #error OpenNI Platform Abstraction Layer - Unsupported Platform!
++ #endif
+ #endif
+ 
++
+ //---------------------------------------------------------------------------
+ // Basic Common Macros
+ //---------------------------------------------------------------------------
+diff -up ./Include/XnTypes.h.willow ./Include/XnTypes.h
+--- ./Include/XnTypes.h.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Include/XnTypes.h	2015-01-05 20:00:00.964545799 -0500
+@@ -349,7 +349,7 @@ typedef XnUInt16 XnLabel;
+ 
+ // deprecated pragma is only supported in Visual Studio
+ #if (XN_PLATFORM == XN_PLATFORM_WIN32)
+-#pragma deprecated("XN_CAPABILITY_ANTI_FILCKER")
++//#pragma deprecated("XN_CAPABILITY_ANTI_FILCKER")
+ #endif
+ 
+ //---------------------------------------------------------------------------
+diff -up ./Samples/NiAudioSample/NiAudioSample.cpp.willow ./Samples/NiAudioSample/NiAudioSample.cpp
+--- ./Samples/NiAudioSample/NiAudioSample.cpp.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Samples/NiAudioSample/NiAudioSample.cpp	2015-01-05 20:00:00.964545799 -0500
+@@ -32,7 +32,7 @@
+ //---------------------------------------------------------------------------
+ // Defines
+ //---------------------------------------------------------------------------
+-#define SAMPLE_XML_PATH "../../../../Data/SamplesConfig.xml"
++#define SAMPLE_XML_PATH "/etc/openni/SamplesConfig.xml"
+ 
+ #define NUMBER_OF_AUDIO_BUFFERS 100
+ 
+diff -up ./Samples/NiCRead/NiCRead.c.willow ./Samples/NiCRead/NiCRead.c
+--- ./Samples/NiCRead/NiCRead.c.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Samples/NiCRead/NiCRead.c	2015-01-05 20:00:00.964545799 -0500
+@@ -26,7 +26,7 @@
+ //---------------------------------------------------------------------------
+ // Defines
+ //---------------------------------------------------------------------------
+-#define SAMPLE_XML_PATH "../../../../Data/SamplesConfig.xml"
++#define SAMPLE_XML_PATH "/etc/openni/SamplesConfig.xml"
+ #define SAMPLE_XML_PATH_LOCAL "SamplesConfig.xml"
+ 
+ //---------------------------------------------------------------------------
+diff -up ./Samples/NiRecordRaw/NiRecordRaw.cpp.willow ./Samples/NiRecordRaw/NiRecordRaw.cpp
+--- ./Samples/NiRecordRaw/NiRecordRaw.cpp.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Samples/NiRecordRaw/NiRecordRaw.cpp	2015-01-05 20:00:00.965545837 -0500
+@@ -29,7 +29,7 @@
+ //---------------------------------------------------------------------------
+ // Defines
+ //---------------------------------------------------------------------------
+-#define SAMPLE_XML_PATH "../../../../Data/SamplesConfig.xml"
++#define SAMPLE_XML_PATH "/etc/openni/SamplesConfig.xml"
+ #define RECORDING_FILE_NAME "recordingWithRaw.oni"
+ #define RAW_NODE_NAME "Raw1"
+ 
+diff -up ./Samples/NiRecordSynthetic/NiRecordSynthetic.cpp.willow ./Samples/NiRecordSynthetic/NiRecordSynthetic.cpp
+--- ./Samples/NiRecordSynthetic/NiRecordSynthetic.cpp.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Samples/NiRecordSynthetic/NiRecordSynthetic.cpp	2015-01-05 20:00:00.965545837 -0500
+@@ -29,7 +29,7 @@
+ //---------------------------------------------------------------------------
+ // Defines
+ //---------------------------------------------------------------------------
+-#define SAMPLE_XML_PATH "../../../../Data/SamplesConfig.xml"
++#define SAMPLE_XML_PATH "/etc/openni/SamplesConfig.xml"
+ 
+ //---------------------------------------------------------------------------
+ // Macros
+diff -up ./Samples/NiSimpleRead/NiSimpleRead.cpp.willow ./Samples/NiSimpleRead/NiSimpleRead.cpp
+--- ./Samples/NiSimpleRead/NiSimpleRead.cpp.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Samples/NiSimpleRead/NiSimpleRead.cpp	2015-01-05 20:00:00.965545837 -0500
+@@ -29,7 +29,7 @@
+ //---------------------------------------------------------------------------
+ // Defines
+ //---------------------------------------------------------------------------
+-#define SAMPLE_XML_PATH "../../../../Data/SamplesConfig.xml"
++#define SAMPLE_XML_PATH "/etc/openni/SamplesConfig.xml"
+ #define SAMPLE_XML_PATH_LOCAL "SamplesConfig.xml"
+ 
+ //---------------------------------------------------------------------------
+diff -up ./Samples/NiSimpleViewer/NiSimpleViewer.cpp.willow ./Samples/NiSimpleViewer/NiSimpleViewer.cpp
+--- ./Samples/NiSimpleViewer/NiSimpleViewer.cpp.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Samples/NiSimpleViewer/NiSimpleViewer.cpp	2015-01-05 20:00:00.965545837 -0500
+@@ -35,7 +35,7 @@ using namespace xn;
+ //---------------------------------------------------------------------------
+ // Defines
+ //---------------------------------------------------------------------------
+-#define SAMPLE_XML_PATH "../../../../Data/SamplesConfig.xml"
++#define SAMPLE_XML_PATH "/etc/openni/SamplesConfig.xml"
+ 
+ #define GL_WIN_SIZE_X 1280
+ #define GL_WIN_SIZE_Y 1024
+diff -up ./Samples/NiUserTracker/main.cpp.willow ./Samples/NiUserTracker/main.cpp
+--- ./Samples/NiUserTracker/main.cpp.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Samples/NiUserTracker/main.cpp	2015-01-05 20:00:00.965545837 -0500
+@@ -314,7 +314,7 @@ void glInit (int * pargc, char ** argv)
+ }
+ #endif // USE_GLES
+ 
+-#define SAMPLE_XML_PATH "../../../../Data/SamplesConfig.xml"
++#define SAMPLE_XML_PATH "/etc/openni/SamplesConfig.xml"
+ 
+ #define CHECK_RC(nRetVal, what)										\
+ 	if (nRetVal != XN_STATUS_OK)									\
+diff -up ./Samples/NiViewer/NiViewer.cpp.willow ./Samples/NiViewer/NiViewer.cpp
+--- ./Samples/NiViewer/NiViewer.cpp.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Samples/NiViewer/NiViewer.cpp	2015-01-05 20:00:00.966545875 -0500
+@@ -85,7 +85,7 @@ using namespace glh;
+ // --------------------------------
+ // Defines
+ // --------------------------------
+-#define SAMPLE_XML_PATH "../../../../Data/SamplesConfig.xml"
++#define SAMPLE_XML_PATH "/etc/openni/SamplesConfig.xml"
+ 
+ // --------------------------------
+ // Types
+diff -up ./Source/OpenNI/XnOpenNI.cpp.willow ./Source/OpenNI/XnOpenNI.cpp
+--- ./Source/OpenNI/XnOpenNI.cpp.willow	2013-11-12 11:30:03.000000000 -0500
++++ ./Source/OpenNI/XnOpenNI.cpp	2015-01-05 20:00:26.612524757 -0500
+@@ -7070,7 +7070,7 @@ XN_C_API XnStatus xnScriptNodeRun(XnNode
+ #if (XN_PLATFORM == XN_PLATFORM_WIN32)
+ 	#define XN_OPEN_NI_FILES_LOCATION "\\Data\\"
+ #elif (CE4100)
+-	#define XN_OPEN_NI_FILES_LOCATION "/usr/etc/ni/"
++	#define XN_OPEN_NI_FILES_LOCATION "/etc/ni/"
+ #elif (XN_PLATFORM == XN_PLATFORM_LINUX_X86 || XN_PLATFORM == XN_PLATFORM_LINUX_ARM || XN_PLATFORM == XN_PLATFORM_MACOSX)
+ 	#define XN_OPEN_NI_FILES_LOCATION "/var/lib/ni/"
+ #elif (XN_PLATFORM == XN_PLATFORM_ANDROID_ARM)
+@@ -7096,7 +7096,7 @@ XnStatus xnGetOpenNIConfFilesPath(XnChar
+ 			return nRetVal;
+ 		#else
+ 			// use root FS
+-			strDest[0] = '\0';
++			strcpy (strDest, "");
+ 		#endif
+ 	}
+ 	else

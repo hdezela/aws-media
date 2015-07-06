@@ -1,0 +1,12 @@
+--- mozjs17.0.0/js/src/jsinterp.cpp.jsinterp	Thu Jun 11 02:27:52 2015
++++ mozjs17.0.0/js/src/jsinterp.cpp	Mon Feb 11 17:33:22 2013
+@@ -3664,7 +3664,9 @@
+ BEGIN_CASE(JSOP_LEAVEFORLETIN)
+ BEGIN_CASE(JSOP_LEAVEBLOCKEXPR)
+ {
++    #ifdef DEBUG
+     DebugOnly<uint32_t> blockDepth = regs.fp()->blockChain().stackDepth();
++    #endif
+ 
+     regs.fp()->popBlock(cx);
+ 

@@ -1,0 +1,60 @@
+--- a/src/makefile
++++ b/src/makefile
+@@ -53,7 +53,7 @@ CDIR_linux?=lib/lua/$(LUAV)
+ LDIR_linux?=share/lua/$(LUAV)
+ 
+ # where lua headers are found for mingw builds
+-# LUAINC_mingw: 
++# LUAINC_mingw:
+ # /opt/local/include
+ LUAINC_mingw_base?=/usr/include
+ LUAINC_mingw?=$(LUAINC_mingw_base)/lua/$(LUAV)
+@@ -135,7 +135,7 @@ DEF_macosx= -DLUASOCKET_$(DEBUG) -DUNIX_
+ 	-DMIME_API='__attribute__((visibility("default")))'
+ CFLAGS_macosx= -I$(LUAINC) $(DEF) -pedantic -Wall -O2 -fno-common \
+ 	-fvisibility=hidden
+-LDFLAGS_macosx= -bundle -undefined dynamic_lookup -o 
++LDFLAGS_macosx= -bundle -undefined dynamic_lookup -o
+ LD_macosx= export MACOSX_DEPLOYMENT_TARGET="10.3"; gcc
+ SOCKET_macosx=usocket.o
+ 
+@@ -149,9 +149,9 @@ DEF_linux=-DLUASOCKET_$(DEBUG) -DLUA_$(C
+ 	-DLUASOCKET_API='__attribute__((visibility("default")))' \
+ 	-DUNIX_API='__attribute__((visibility("default")))' \
+ 	-DMIME_API='__attribute__((visibility("default")))'
+-CFLAGS_linux= -I$(LUAINC) $(DEF) -pedantic -Wall -Wshadow -Wextra \
+-	-Wimplicit -O2 -ggdb3 -fpic -fvisibility=hidden
+-LDFLAGS_linux=-O -shared -fpic -o 
++CFLAGS_linux= -I$(LUAINC) $(DEF) $(OPTFLAGS) \
++	-fvisibility=hidden
++LDFLAGS_linux=$(OPTFLAGS) -shared -o
+ LD_linux=gcc
+ SOCKET_linux=usocket.o
+ 
+@@ -166,7 +166,7 @@ DEF_mingw= -DLUASOCKET_INET_PTON -DLUASO
+ 	-DMIME_API='__declspec(dllexport)'
+ CFLAGS_mingw= -I$(LUAINC) $(DEF) -pedantic -Wall -O2 -fno-common \
+ 	-fvisibility=hidden
+-LDFLAGS_mingw= $(LUALIB) -shared -Wl,-s -lws2_32 -o 
++LDFLAGS_mingw= $(LUALIB) -shared -Wl,-s -lws2_32 -o
+ LD_mingw=gcc
+ SOCKET_mingw=wsocket.o
+ 
+@@ -181,7 +181,7 @@ DEF_win32= //D "WIN32" //D "NDEBUG" //D
+      //D "LUASOCKET_API=__declspec(dllexport)" //D "_CRT_SECURE_NO_WARNINGS" \
+      //D "_WINDLL" //D "LUA_$(COMPAT)_MODULE" \
+ 	 //D "MIME_API=__declspec(dllexport)" \
+-     //D "LUASOCKET_$(DEBUG)" 
++     //D "LUASOCKET_$(DEBUG)"
+ CFLAGS_win32=//I "$(LUAINC)" $(DEF) //O2 //Ot //MD //W3 //nologo
+ LDFLAGS_win32= //nologo //link //NOLOGO //DLL //INCREMENTAL:NO \
+     //MANIFEST //MANIFESTFILE:"intermediate.manifest" \
+@@ -323,7 +323,7 @@ $(UNIX_SO): $(UNIX_OBJS)
+ $(SERIAL_SO): $(SERIAL_OBJS)
+ 	$(LD) $(SERIAL_OBJS) $(LDFLAGS)$@
+ 
+-install: 
++install:
+ 	$(INSTALL_DIR) $(INSTALL_TOP_LDIR)
+ 	$(INSTALL_DATA) $(TO_TOP_LDIR) $(INSTALL_TOP_LDIR)
+ 	$(INSTALL_DIR) $(INSTALL_SOCKET_LDIR)
